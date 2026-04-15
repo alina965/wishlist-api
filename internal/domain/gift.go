@@ -1,7 +1,7 @@
 package domain
 
 type Gift struct {
-	ID         string  `json:"id"`
+	ID         int     `json:"id"`
 	Title      string  `json:"title"`
 	Desc       string  `json:"description"`
 	Link       string  `json:"link"`

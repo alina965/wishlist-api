@@ -6,18 +6,18 @@ import (
 	"fmt"
 	"time"
 	"wishlists_project/internal/domain"
-	"wishlists_project/internal/infrastructure/repository"
+	"wishlists_project/internal/domain/repository"
 
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthService struct {
-	userRepo  repository.UserRepository
+	userRepo  repository.UserRepositoryInterface
 	jwtSecret string
 }
 
-func NewAuthService(userRepo repository.UserRepository, jwtSecret string) *AuthService {
+func NewAuthService(userRepo repository.UserRepositoryInterface, jwtSecret string) *AuthService {
 	return &AuthService{userRepo: userRepo, jwtSecret: jwtSecret}
 }
 

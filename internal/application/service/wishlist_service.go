@@ -8,14 +8,14 @@ import (
 	"fmt"
 	"time"
 	"wishlists_project/internal/domain"
-	"wishlists_project/internal/infrastructure/repository"
+	"wishlists_project/internal/domain/repository"
 )
 
 type WishlistService struct {
-	wishlistRepo repository.WishlistRepository
+	wishlistRepo repository.WishlistRepositoryInterface
 }
 
-func NewWishlistService(wishlistRepo repository.WishlistRepository) *WishlistService {
+func NewWishlistService(wishlistRepo repository.WishlistRepositoryInterface) *WishlistService {
 	return &WishlistService{
 		wishlistRepo: wishlistRepo,
 	}
@@ -44,7 +44,15 @@ func (service *WishlistService) CreateWishlist(title string, desc string, eventD
 }
 
 func (service *WishlistService) DeleteWishlist(id int) error {
-	err := service.wishlistRepo.DeleteWishlist(id)
+	_, err := service.wishlistRepo.FindWishlistByID(id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return errors.New("wishlist not found")
+		}
+		return errors.New("cannot delete wishlist: " + err.Error())
+	}
+
+	err = service.wishlistRepo.DeleteWishlist(id)
 	if err != nil {
 		return errors.New("cannot delete wishlist" + err.Error())
 	}
@@ -53,8 +61,11 @@ func (service *WishlistService) DeleteWishlist(id int) error {
 
 func (service *WishlistService) UpdateWishlist(title string, desc string, eventDate time.Time, id int) error {
 	wishlist, err := service.wishlistRepo.FindWishlistByID(id)
-	if !errors.Is(err, sql.ErrNoRows) {
-		return err
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return errors.New("wishlist not found")
+		}
+		return errors.New("cannot update wishlist: " + err.Error())
 	}
 
 	if title != "" {
@@ -69,7 +80,10 @@ func (service *WishlistService) UpdateWishlist(title string, desc string, eventD
 		wishlist.EventDate = eventDate
 	}
 
-	service.wishlistRepo.UpdateWishlist(wishlist)
+	err = service.wishlistRepo.UpdateWishlist(wishlist)
+	if err != nil {
+		return errors.New("cannot update wishlist: " + err.Error())
+	}
 
 	return nil
 }
