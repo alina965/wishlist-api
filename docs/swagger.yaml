@@ -1,0 +1,563 @@
+basePath: /api
+definitions:
+  domain.Gift:
+    properties:
+      description:
+        type: string
+      id:
+        type: integer
+      is_reserved:
+        type: boolean
+      link:
+        type: string
+      priority:
+        type: integer
+      reserved_by:
+        type: string
+      title:
+        type: string
+      wishlist_id:
+        type: integer
+    type: object
+  domain.User:
+    properties:
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      password:
+        type: string
+      token:
+        type: string
+    type: object
+  domain.Wishlist:
+    properties:
+      desc:
+        type: string
+      event_date:
+        type: string
+      gifts:
+        items:
+          $ref: '#/definitions/domain.Gift'
+        type: array
+      id:
+        type: integer
+      share_token:
+        type: string
+      title:
+        type: string
+      user_id:
+        type: integer
+    type: object
+  requests.CreateGiftRequest:
+    properties:
+      desc:
+        type: string
+      link:
+        type: string
+      priority:
+        type: integer
+      title:
+        type: string
+      wishlist_id:
+        type: integer
+    type: object
+  requests.CreateWishlistRequest:
+    properties:
+      desc:
+        type: string
+      eventDate:
+        type: string
+      title:
+        type: string
+    type: object
+  requests.DeleteGiftRequest:
+    properties:
+      id:
+        type: integer
+    type: object
+  requests.DeleteWishlistRequest:
+    properties:
+      id:
+        type: integer
+    type: object
+  requests.GetWishlistRequest:
+    properties:
+      id:
+        type: integer
+    type: object
+  requests.LoginRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  requests.RegisterRequest:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+    type: object
+  requests.ReserveGiftRequest:
+    properties:
+      gift_id:
+        type: integer
+      reserved_by:
+        type: string
+    type: object
+  requests.UpdateWishlistRequest:
+    properties:
+      desc:
+        type: string
+      eventDate:
+        type: string
+      id:
+        type: integer
+      title:
+        type: string
+    type: object
+  responses.SuccessResponse:
+    properties:
+      message:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: Wishlist management service for creating and sharing wishlists
+  title: Wishlist API
+  version: "1.0"
+paths:
+  /gifts:
+    delete:
+      consumes:
+      - application/json
+      description: Removes a gift from wishlist
+      parameters:
+      - description: Gift ID
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requests.DeleteGiftRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Gift deleted
+          schema:
+            $ref: '#/definitions/responses.SuccessResponse'
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete gift
+      tags:
+      - gifts
+    get:
+      description: Returns all gifts for a specific wishlist (public)
+      parameters:
+      - description: Wishlist ID
+        in: query
+        name: wishlist_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of gifts
+          schema:
+            items:
+              $ref: '#/definitions/domain.Gift'
+            type: array
+        "400":
+          description: Invalid wishlist_id
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: No gifts found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get gifts by wishlist ID
+      tags:
+      - gifts
+    post:
+      consumes:
+      - application/json
+      description: Creates a new gift in specified wishlist
+      parameters:
+      - description: Gift data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requests.CreateGiftRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Gift created
+          schema:
+            $ref: '#/definitions/responses.SuccessResponse'
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Add gift to wishlist
+      tags:
+      - gifts
+  /gifts/reserve:
+    post:
+      consumes:
+      - application/json
+      description: Reserves a gift by share token (public endpoint)
+      parameters:
+      - description: Reservation data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requests.ReserveGiftRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Gift reserved
+          schema:
+            $ref: '#/definitions/responses.SuccessResponse'
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Gift already reserved
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Reserve a gift
+      tags:
+      - gifts
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates user and returns JWT token
+      parameters:
+      - description: Login credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requests.LoginRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Login successful
+          schema:
+            $ref: '#/definitions/domain.User'
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Invalid email or password
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Login user
+      tags:
+      - auth
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new user account and returns JWT token
+      parameters:
+      - description: User registration data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requests.RegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User created successfully
+          schema:
+            $ref: '#/definitions/domain.User'
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "409":
+          description: Email already taken
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Register new user
+      tags:
+      - auth
+  /wishlists:
+    get:
+      description: Returns all wishlists for authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of wishlists
+          schema:
+            items:
+              $ref: '#/definitions/domain.Wishlist'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get user wishlists
+      tags:
+      - wishlists
+    post:
+      consumes:
+      - application/json
+      description: Creates a wishlist for authenticated user
+      parameters:
+      - description: Wishlist data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requests.CreateWishlistRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Wishlist created
+          schema:
+            $ref: '#/definitions/responses.SuccessResponse'
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Create new wishlist
+      tags:
+      - wishlists
+  /wishlists/delete:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes wishlist and all its gifts
+      parameters:
+      - description: Wishlist ID
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requests.DeleteWishlistRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Wishlist deleted
+          schema:
+            $ref: '#/definitions/responses.SuccessResponse'
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Wishlist not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Delete wishlist
+      tags:
+      - wishlists
+  /wishlists/get:
+    get:
+      consumes:
+      - application/json
+      description: Returns specific wishlist for authenticated user
+      parameters:
+      - description: Wishlist ID
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requests.GetWishlistRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Wishlist found
+          schema:
+            $ref: '#/definitions/domain.Wishlist'
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Wishlist not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Get wishlist by ID
+      tags:
+      - wishlists
+  /wishlists/public:
+    get:
+      description: Public access to wishlist without authentication
+      parameters:
+      - description: Share token
+        in: query
+        name: token
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Wishlist found
+          schema:
+            $ref: '#/definitions/domain.Wishlist'
+        "400":
+          description: Token required
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Wishlist not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Get wishlist by share token
+      tags:
+      - wishlists
+  /wishlists/update:
+    put:
+      consumes:
+      - application/json
+      description: Updates existing wishlist data
+      parameters:
+      - description: Updated wishlist data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/requests.UpdateWishlistRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Wishlist updated
+          schema:
+            $ref: '#/definitions/responses.SuccessResponse'
+        "400":
+          description: Invalid request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Wishlist not found
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      security:
+      - BearerAuth: []
+      summary: Update wishlist
+      tags:
+      - wishlists
+securityDefinitions:
+  BearerAuth:
+    description: 'Enter JWT token in format: Bearer <token>'
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

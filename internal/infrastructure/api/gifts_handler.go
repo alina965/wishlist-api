@@ -17,6 +17,18 @@ func NewGiftsHandler(giftService *service.GiftService) *GiftsHandler {
 	return &GiftsHandler{giftService: giftService}
 }
 
+// CreateGift
+// @Summary      Add gift to wishlist
+// @Description  Creates a new gift in specified wishlist
+// @Tags         gifts
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        request body requests.CreateGiftRequest true "Gift data"
+// @Success      201 {object} responses.SuccessResponse "Gift created"
+// @Failure      400 {object} map[string]string "Invalid request"
+// @Failure      401 {object} map[string]string "Unauthorized"
+// @Router       /gifts [post]
 func (handler *GiftsHandler) CreateGift(w http.ResponseWriter, r *http.Request) {
 	_, ok := r.Context().Value("user_id").(int)
 	if !ok {
@@ -53,6 +65,18 @@ func (handler *GiftsHandler) CreateGift(w http.ResponseWriter, r *http.Request) 
 	json.NewEncoder(w).Encode(responses.SuccessResponse{Message: "Gift created successfully"})
 }
 
+// DeleteGift
+// @Summary      Delete gift
+// @Description  Removes a gift from wishlist
+// @Tags         gifts
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        request body requests.DeleteGiftRequest true "Gift ID"
+// @Success      200 {object} responses.SuccessResponse "Gift deleted"
+// @Failure      400 {object} map[string]string "Invalid request"
+// @Failure      401 {object} map[string]string "Unauthorized"
+// @Router       /gifts [delete]
 func (handler *GiftsHandler) DeleteGift(w http.ResponseWriter, r *http.Request) {
 	_, ok := r.Context().Value("user_id").(int)
 	if !ok {
@@ -82,6 +106,17 @@ func (handler *GiftsHandler) DeleteGift(w http.ResponseWriter, r *http.Request) 
 	json.NewEncoder(w).Encode(responses.SuccessResponse{Message: "Gift deleted successfully"})
 }
 
+// ReserveGift
+// @Summary      Reserve a gift
+// @Description      Reserves a gift by share token (public endpoint)
+// @Tags         gifts
+// @Accept       json
+// @Produce      json
+// @Param        request body requests.ReserveGiftRequest true "Reservation data"
+// @Success      200 {object} responses.SuccessResponse "Gift reserved"
+// @Failure      400 {object} map[string]string "Invalid request"
+// @Failure      409 {object} map[string]string "Gift already reserved"
+// @Router       /gifts/reserve [post]
 func (handler *GiftsHandler) ReserveGift(w http.ResponseWriter, r *http.Request) {
 	var req requests.ReserveGiftRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -109,6 +144,16 @@ func (handler *GiftsHandler) ReserveGift(w http.ResponseWriter, r *http.Request)
 	json.NewEncoder(w).Encode(responses.SuccessResponse{Message: "Gift reserved successfully"})
 }
 
+// GetGiftsByWishlist
+// @Summary      Get gifts by wishlist ID
+// @Description  Returns all gifts for a specific wishlist (public)
+// @Tags         gifts
+// @Produce      json
+// @Param        wishlist_id query int true "Wishlist ID"
+// @Success      200 {array} domain.Gift "List of gifts"
+// @Failure      400 {object} map[string]string "Invalid wishlist_id"
+// @Failure      404 {object} map[string]string "No gifts found"
+// @Router       /gifts [get]
 func (handler *GiftsHandler) GetGiftsByWishlist(w http.ResponseWriter, r *http.Request) {
 	wishlistIDStr := r.URL.Query().Get("wishlist_id")
 	if wishlistIDStr == "" {

@@ -18,6 +18,18 @@ func NewWishlistsHandler(wishlistService *service.WishlistService) *WishlistsHan
 	}
 }
 
+// CreateWishlist
+// @Summary      Create new wishlist
+// @Description  Creates a wishlist for authenticated user
+// @Tags         wishlists
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        request body requests.CreateWishlistRequest true "Wishlist data"
+// @Success      201 {object} responses.SuccessResponse "Wishlist created"
+// @Failure      400 {object} map[string]string "Invalid request"
+// @Failure      401 {object} map[string]string "Unauthorized"
+// @Router       /wishlists [post]
 func (handler *WishlistsHandler) CreateWishlist(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value("user_id").(int)
 	if !ok {
@@ -48,6 +60,19 @@ func (handler *WishlistsHandler) CreateWishlist(w http.ResponseWriter, r *http.R
 	json.NewEncoder(w).Encode(responses.SuccessResponse{Message: "Wishlist created successfully"})
 }
 
+// UpdateWishlist
+// @Summary      Update wishlist
+// @Description  Updates existing wishlist data
+// @Tags         wishlists
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        request body requests.UpdateWishlistRequest true "Updated wishlist data"
+// @Success      200 {object} responses.SuccessResponse "Wishlist updated"
+// @Failure      400 {object} map[string]string "Invalid request"
+// @Failure      401 {object} map[string]string "Unauthorized"
+// @Failure      404 {object} map[string]string "Wishlist not found"
+// @Router       /wishlists/update [put]
 func (handler *WishlistsHandler) UpdateWishlist(w http.ResponseWriter, r *http.Request) {
 	_, ok := r.Context().Value("user_id").(int)
 	if !ok {
@@ -77,6 +102,19 @@ func (handler *WishlistsHandler) UpdateWishlist(w http.ResponseWriter, r *http.R
 	json.NewEncoder(w).Encode(responses.SuccessResponse{Message: "Wishlist updated successfully"})
 }
 
+// DeleteWishlist
+// @Summary      Delete wishlist
+// @Description  Deletes wishlist and all its gifts
+// @Tags         wishlists
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        request body requests.DeleteWishlistRequest true "Wishlist ID"
+// @Success      200 {object} responses.SuccessResponse "Wishlist deleted"
+// @Failure      400 {object} map[string]string "Invalid request"
+// @Failure      401 {object} map[string]string "Unauthorized"
+// @Failure      404 {object} map[string]string "Wishlist not found"
+// @Router       /wishlists/delete [delete]
 func (handler *WishlistsHandler) DeleteWishlist(w http.ResponseWriter, r *http.Request) {
 	_, ok := r.Context().Value("user_id").(int)
 	if !ok {
@@ -100,6 +138,15 @@ func (handler *WishlistsHandler) DeleteWishlist(w http.ResponseWriter, r *http.R
 	json.NewEncoder(w).Encode(responses.SuccessResponse{Message: "Wishlist deleted successfully"})
 }
 
+// GetWishlist
+// @Summary      Get user wishlists
+// @Description  Returns all wishlists for authenticated user
+// @Tags         wishlists
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200 {array} domain.Wishlist "List of wishlists"
+// @Failure      401 {object} map[string]string "Unauthorized"
+// @Router       /wishlists [get]
 func (handler *WishlistsHandler) GetWishlist(w http.ResponseWriter, r *http.Request) {
 	userID, ok := r.Context().Value("user_id").(int)
 	if !ok {
@@ -118,6 +165,19 @@ func (handler *WishlistsHandler) GetWishlist(w http.ResponseWriter, r *http.Requ
 	json.NewEncoder(w).Encode(wishlists)
 }
 
+// GetWishlistByID
+// @Summary      Get wishlist by ID
+// @Description  Returns specific wishlist for authenticated user
+// @Tags         wishlists
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        request body requests.GetWishlistRequest true "Wishlist ID"
+// @Success      200 {object} domain.Wishlist "Wishlist found"
+// @Failure      400 {object} map[string]string "Invalid request"
+// @Failure      401 {object} map[string]string "Unauthorized"
+// @Failure      404 {object} map[string]string "Wishlist not found"
+// @Router       /wishlists/get [get]
 func (handler *WishlistsHandler) GetWishlistByID(w http.ResponseWriter, r *http.Request) {
 	_, ok := r.Context().Value("user_id").(int)
 	if !ok {
@@ -143,6 +203,16 @@ func (handler *WishlistsHandler) GetWishlistByID(w http.ResponseWriter, r *http.
 	json.NewEncoder(w).Encode(wishlist)
 }
 
+// GetWishlistByToken
+// @Summary      Get wishlist by share token
+// @Description  Public access to wishlist without authentication
+// @Tags         wishlists
+// @Produce      json
+// @Param        token query string true "Share token"
+// @Success      200 {object} domain.Wishlist "Wishlist found"
+// @Failure      400 {object} map[string]string "Token required"
+// @Failure      404 {object} map[string]string "Wishlist not found"
+// @Router       /wishlists/public [get]
 func (handler *WishlistsHandler) GetWishlistByToken(w http.ResponseWriter, r *http.Request) {
 	token := r.URL.Query().Get("token")
 	if token == "" {
