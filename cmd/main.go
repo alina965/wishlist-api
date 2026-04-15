@@ -37,9 +37,9 @@ func main() {
 	wishlistRepo := repository.NewWishlistRepository(store.GetDB())
 	giftRepo := repository.NewGiftRepository(store.GetDB())
 
-	authService := service.NewAuthService(*userRepo, jwtSecret)
-	wishlistService := service.NewWishlistService(*wishlistRepo)
-	giftService := service.NewGiftService(*giftRepo)
+	authService := service.NewAuthService(userRepo, jwtSecret)
+	wishlistService := service.NewWishlistService(wishlistRepo)
+	giftService := service.NewGiftService(giftRepo)
 
 	authHandler := api.NewAuthHandler(authService)
 	wishlistHandler := api.NewWishlistsHandler(wishlistService)

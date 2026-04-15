@@ -14,7 +14,7 @@ type WishlistRepositoryInterface interface {
 	CreateWishlist(wishlist *domain.Wishlist) error
 	FindWishlistByID(id int) (*domain.Wishlist, error)
 	FindWishlistsByUserID(userID int) ([]domain.Wishlist, error)
-	UpdateWishlist(wishlist *domain.Wishlist) error
+	UpdateWishlist(wishlist *domain.Wishlist)
 	DeleteWishlist(id int) error
 	FindWishlistByToken(token string) (*domain.Wishlist, error)
 }
@@ -23,6 +23,6 @@ type GiftRepositoryInterface interface {
 	CreateGift(gift *domain.Gift) error
 	FindGiftByID(id int) (*domain.Gift, error)
 	FindGiftsByWishlistID(wishlistID int) ([]domain.Gift, error)
-	UpdateGift(gift *domain.Gift) error
+	UpdateGift(gift *domain.Gift)
 	DeleteGift(id int) error
 }

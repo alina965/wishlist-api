@@ -46,9 +46,8 @@ func (m *MockWishlistRepository) FindWishlistsByUserID(userID int) ([]domain.Wis
 	return result, nil
 }
 
-func (m *MockWishlistRepository) UpdateWishlist(wishlist *domain.Wishlist) error {
+func (m *MockWishlistRepository) UpdateWishlist(wishlist *domain.Wishlist) {
 	m.wishlists[wishlist.ID] = *wishlist
-	return nil
 }
 
 func (m *MockWishlistRepository) DeleteWishlist(id int) error {

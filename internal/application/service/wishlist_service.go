@@ -80,11 +80,7 @@ func (service *WishlistService) UpdateWishlist(title string, desc string, eventD
 		wishlist.EventDate = eventDate
 	}
 
-	err = service.wishlistRepo.UpdateWishlist(wishlist)
-	if err != nil {
-		return errors.New("cannot update wishlist: " + err.Error())
-	}
-
+	service.wishlistRepo.UpdateWishlist(wishlist)
 	return nil
 }
 

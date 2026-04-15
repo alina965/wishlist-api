@@ -45,9 +45,8 @@ func (m *MockGiftRepository) FindGiftsByWishlistID(wishlistID int) ([]domain.Gif
 	return result, nil
 }
 
-func (m *MockGiftRepository) UpdateGift(gift *domain.Gift) error {
+func (m *MockGiftRepository) UpdateGift(gift *domain.Gift) {
 	m.gifts[gift.ID] = *gift
-	return nil
 }
 
 func (m *MockGiftRepository) DeleteGift(id int) error {
